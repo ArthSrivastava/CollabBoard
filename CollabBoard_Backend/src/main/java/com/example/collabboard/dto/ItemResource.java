@@ -1,6 +1,6 @@
-package com.example.trello_backend.dto;
+package com.example.collabboard.dto;
 
-import com.example.trello_backend.model.ItemStatus;
+import com.example.collabboard.model.ItemStatus;
 import lombok.Data;
 
 import java.time.Instant;

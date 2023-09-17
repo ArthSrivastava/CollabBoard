@@ -1,11 +1,11 @@
-package com.example.trello_backend.service;
+package com.example.collabboard.service;
 
-import com.example.trello_backend.dto.ItemPatchResource;
-import com.example.trello_backend.dto.ItemResource;
-import com.example.trello_backend.dto.ItemUpdateResource;
-import com.example.trello_backend.dto.NewItemResource;
-import com.example.trello_backend.model.Item;
-import com.example.trello_backend.repository.ItemRepository;
+import com.example.collabboard.dto.ItemPatchResource;
+import com.example.collabboard.dto.ItemResource;
+import com.example.collabboard.dto.ItemUpdateResource;
+import com.example.collabboard.dto.NewItemResource;
+import com.example.collabboard.model.Item;
+import com.example.collabboard.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.example.trello_backend.model;
+package com.example.collabboard.model;
 
 public enum ItemStatus {
     TODO,

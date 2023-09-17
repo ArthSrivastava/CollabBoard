@@ -1,4 +1,4 @@
-package com.example.trello_backend.config;
+package com.example.collabboard.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

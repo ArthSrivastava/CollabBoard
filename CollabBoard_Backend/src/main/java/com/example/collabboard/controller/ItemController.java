@@ -1,12 +1,14 @@
-package com.example.trello_backend.controller;
+package com.example.collabboard.controller;
 
-import com.example.trello_backend.dto.ItemPatchResource;
-import com.example.trello_backend.dto.ItemResource;
-import com.example.trello_backend.dto.ItemUpdateResource;
-import com.example.trello_backend.dto.NewItemResource;
-import com.example.trello_backend.service.ItemService;
+import com.example.collabboard.dto.ItemPatchResource;
+import com.example.collabboard.dto.ItemResource;
+import com.example.collabboard.dto.ItemUpdateResource;
+import com.example.collabboard.dto.NewItemResource;
+import com.example.collabboard.service.ItemService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

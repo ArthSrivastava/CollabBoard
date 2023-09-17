@@ -1,4 +1,4 @@
-package com.example.trello_backend.dto;
+package com.example.collabboard.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
