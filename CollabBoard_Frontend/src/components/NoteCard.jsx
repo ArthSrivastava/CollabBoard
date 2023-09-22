@@ -6,17 +6,15 @@ import {
     Button,
   } from "@material-tailwind/react";
    
-  export const NoteCard = ({data}) => {
+  export const NoteCard = ({item}) => {
     return (
       <Card className="mt-6 w-96">
         <CardBody>
           <Typography variant="h5" color="blue-gray" className="mb-2">
-            Note 1
+            {item.id}
           </Typography>
           <Typography>
-            The place is close to Barceloneta Beach and bus stop just 2 min by
-            walk and near to &quot;Naviglio&quot; where you can enjoy the main
-            night life in Barcelona.
+            {item.description}
           </Typography>
         </CardBody>
       </Card>
