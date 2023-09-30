@@ -6,9 +6,7 @@ import com.example.collabboard.dto.ItemUpdateResource;
 import com.example.collabboard.dto.NewItemResource;
 import com.example.collabboard.service.ItemService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,10 +14,11 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/items")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ItemController {
     private final ItemService itemService;
 
-    @CrossOrigin(origins = "http://localhost:5173")
+
     @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ItemResource> getAllItems() {
         return itemService.getAllItems();

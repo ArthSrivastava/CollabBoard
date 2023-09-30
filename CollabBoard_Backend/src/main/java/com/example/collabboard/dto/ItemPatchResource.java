@@ -9,10 +9,7 @@ import java.util.Optional;
 
 @Data
 public class ItemPatchResource {
+    private Optional<@NotBlank String> description;
 
-    @NotBlank
-    private Optional<String> description;
-
-    @NonNull
-    private Optional<ItemStatus> status;
+    private Optional<@NonNull ItemStatus> status;
 }
