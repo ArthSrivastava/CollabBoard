@@ -38,14 +38,14 @@ export const getItemById = (id) => {
   return ajax.get(`${BASE_URL}/item/${id}`);
 }
 
-export const deleteItem = (id) => {
-  return ajax.delete(`${BASE_URL}/items/${id}`);
+export const deleteItem = (id, version) => {
+  return ajax.delete(`${BASE_URL}/items/${id}`, {'if-match': version});
 }
 
-export const updateDescription = (description, id) => {
-  return ajax.patch(`${BASE_URL}/items/${id}`, description)
+export const updateDescription = (body, id, version) => {
+  return ajax.patch(`${BASE_URL}/items/${id}`, body, {'if-match': version})
 }
 
-export const updateStatus = (status, id) => {
-  return ajax.patch(`${BASE_URL}/items/${id}`, status)
+export const updateStatus = (body, id, version) => {
+  return ajax.patch(`${BASE_URL}/items/${id}`, body, {'if-match': version})
 }
