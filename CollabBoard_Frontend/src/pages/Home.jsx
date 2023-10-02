@@ -21,7 +21,6 @@ const Home = () => {
   useEffect(() => {
     if (!flag) {
       const subscription = getItems().subscribe((item) => {
-        console.log("items:", item);
         const status = item.status;
         switch (status) {
           case "TODO": {
@@ -41,7 +40,7 @@ const Home = () => {
       setFlag(true);
       return () => subscription.unsubscribe();
     }
-  }, []);
+  }, [todoItems, doingItems, doneItems]);
 
   // const addItem = () => {
   //   const item = {
@@ -58,10 +57,13 @@ const Home = () => {
       status: status,
     };
     updateStatus(body, id, version).subscribe({
-      next: (v) => console.log(v),
+      next: (v) => {
+        handleState(status, v.response);
+      },
       error: (e) => console.error(e),
       complete: () => console.info("complete"),
     });
+    
   };
 
   const handleDelete = (item) => {
@@ -72,30 +74,20 @@ const Home = () => {
       complete: () => toast.success("Item deleted successfully!"),
     });
 
-    console.log(deletedItemId, deletedItemStatus);
 
-    //TODO: Fix the state update (deleting in frontend doesn't work when item moved to other status)
     switch (deletedItemStatus) {
       case "TODO": {
         const newTodoData = todoItems.filter(
           (todo) => todo.id != deletedItemId
         );
-        console.log("Inside TODO switch")
-        console.log("Before:", todoItems)
-        console.log("After newTodoData:", newTodoData);
         setTodoItems(newTodoData);
-        console.log("After:", todoItems)
         break;
       }
       case "DOING": {
         const newDoingData = doingItems.filter(
           (doing) => doing.id != deletedItemId
         );
-        console.log("Inside DOING switch")
-        console.log("Before:", doingItems)
-        console.log("After newTodoData:", newDoingData);
         setDoingItems(newDoingData);
-        console.log("After:", doingItems)
         break;
       }
       case "DONE": {
@@ -112,8 +104,6 @@ const Home = () => {
   const onDragEnd = (result) => {
     const { source, destination } = result;
 
-    console.log("Source:", source);
-    console.log("Destination:", destination);
     if (!destination) return;
 
     if (
@@ -138,21 +128,25 @@ const Home = () => {
       add = doneTemp[source.index];
       doneTemp.splice(source.index, 1);
     }
-
     handleUpdateStatus(destination.droppableId, add.id, 1);
-    //Add to destination
-    if (destination.droppableId === "TODO") {
-      todoTemp.splice(destination.index, 0, add);
-    } else if (destination.droppableId === "DOING") {
-      doingTemp.splice(destination.index, 0, add);
-    } else {
-      doneTemp.splice(destination.index, 0, add);
-    }
-
-    setTodoItems(todoTemp);
-    setDoingItems(doingTemp);
-    setDoneItems(doneTemp);
   };
+
+  const handleState = (status, item) => {
+    switch (status) {
+      case "TODO": {
+        setTodoItems((prevItems) => [...prevItems, item]);
+        break;
+      }
+      case "DOING": {
+        setDoingItems((prevItems) => [...prevItems, item]);
+        break;
+      }
+      case "DONE": {
+        setDoneItems((prevItems) => [...prevItems, item]);
+        break;
+      }
+    }
+  }
 
   return (
     <Base>
