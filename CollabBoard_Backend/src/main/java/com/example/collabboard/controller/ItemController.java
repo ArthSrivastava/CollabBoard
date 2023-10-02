@@ -30,18 +30,23 @@ public class ItemController {
     }
 
     @PutMapping("/{id}")
-    public Mono<ItemResource> update(@PathVariable String id, @RequestBody ItemUpdateResource itemUpdateResource) {
-        return itemService.updateItem(id, itemUpdateResource);
+    public Mono<ItemResource> update(@PathVariable String id,
+                                     @RequestHeader(name = "IF_MATCH", required = false) Long version,
+                                     @RequestBody ItemUpdateResource itemUpdateResource) {
+        return itemService.updateItem(id, version, itemUpdateResource);
     }
 
     @PatchMapping("/{id}")
-    public Mono<ItemResource> update(@PathVariable String id, @RequestBody ItemPatchResource itemPatchResource) {
-        return itemService.patch(id, itemPatchResource);
+    public Mono<ItemResource> update(@PathVariable String id,
+                                     @RequestHeader(name = "IF_MATCH", required = false) Long version,
+                                     @RequestBody ItemPatchResource itemPatchResource) {
+        return itemService.patch(id, version, itemPatchResource);
     }
 
 
     @DeleteMapping("/{id}")
-    public Mono<Void> delete(@PathVariable String id) {
-        return itemService.deleteById(id);
+    public Mono<Void> delete(@PathVariable String id,
+                             @RequestHeader(name = "IF_MATCH", required = false) Long version) {
+        return itemService.deleteById(id, version);
     }
 }

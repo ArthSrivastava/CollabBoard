@@ -4,6 +4,8 @@ import com.example.collabboard.dto.ItemPatchResource;
 import com.example.collabboard.dto.ItemResource;
 import com.example.collabboard.dto.ItemUpdateResource;
 import com.example.collabboard.dto.NewItemResource;
+import com.example.collabboard.exception.ItemNotFoundException;
+import com.example.collabboard.exception.UnexpectedItemVersionException;
 import com.example.collabboard.model.Item;
 import com.example.collabboard.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,17 +35,21 @@ public class ItemService {
                 .flatMap(item -> Flux.just(modelMapper.map(item, ItemResource.class)));
     }
 
-    public Mono<ItemResource> getItemById(String id) {
+    public Mono<Item> getItemById(String id, Long expectedVersion) {
         return itemRepository.findById(id)
-                .flatMap(item -> {
-                    ItemResource itemResource = modelMapper.map(item, ItemResource.class);
-                    return Mono.just(itemResource);
+                .switchIfEmpty(Mono.error(new ItemNotFoundException(id)))
+                .handle((item,sink) -> {
+                    if (expectedVersion != null && !expectedVersion.equals(item.getVersion())) {
+                        sink.error(new UnexpectedItemVersionException(expectedVersion, item.getVersion()));
+                    } else {
+                        sink.next(item);
+                    }
                 });
     }
 
     //update full resource
-    public Mono<ItemResource> updateItem(String id, ItemUpdateResource itemUpdateResource) {
-        return itemRepository.findById(id)
+    public Mono<ItemResource> updateItem(String id, Long expectedVersion, ItemUpdateResource itemUpdateResource) {
+        return getItemById(id, expectedVersion)
                 .flatMap(item -> {
                     item.setDescription(itemUpdateResource.getDescription());
                     item.setStatus(itemUpdateResource.getStatus());
@@ -51,8 +57,8 @@ public class ItemService {
                 }).map(item -> modelMapper.map(item, ItemResource.class));
     }
 
-    public Mono<ItemResource> patch(String id, ItemPatchResource itemPatchResource) {
-        return itemRepository.findById(id)
+    public Mono<ItemResource> patch(String id, Long expectedVersion, ItemPatchResource itemPatchResource) {
+        return getItemById(id, expectedVersion)
                 .flatMap(item -> {
                     if (itemPatchResource.getDescription() != null) {
                         item.setDescription(itemPatchResource.getDescription().get());
@@ -64,8 +70,8 @@ public class ItemService {
                 }).map(item -> modelMapper.map(item, ItemResource.class));
     }
 
-    public Mono<Void> deleteById(String id) {
-        return itemRepository.findById(id)
+    public Mono<Void> deleteById(String id, Long expectedVersion) {
+        return getItemById(id, expectedVersion)
                 .flatMap(itemRepository::delete);
     }
 }

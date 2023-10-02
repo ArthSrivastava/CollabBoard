@@ -10,7 +10,7 @@ public class ItemResource {
     private String id;
     private Long version;
     private String description;
-    private ItemStatus itemStatus;
+    private ItemStatus status;
     private Instant createdDate;
     private Instant lastModifiedDate;
 }
