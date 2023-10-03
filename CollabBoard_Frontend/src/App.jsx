@@ -2,12 +2,16 @@ import Home from "./pages/Home";
 import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+
 function App() {
   return (
-    <>
-    <ToastContainer position="bottom-center"/>
-      <Home />
-    </>
+    <BrowserRouter>
+      <ToastContainer position="bottom-center" />
+      <Routes>
+        <Route path="/" element={<Home />}/>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

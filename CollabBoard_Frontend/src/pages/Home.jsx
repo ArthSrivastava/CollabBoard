@@ -6,6 +6,7 @@ import {
   createItem,
   deleteItem,
   getItems,
+  updateDescription,
   updateStatus,
 } from "../services/ItemService";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
@@ -40,7 +41,7 @@ const Home = () => {
       setFlag(true);
       return () => subscription.unsubscribe();
     }
-  }, [todoItems, doingItems, doneItems]);
+  }, []);
 
   // const addItem = () => {
   //   const item = {
@@ -65,6 +66,8 @@ const Home = () => {
     });
     
   };
+
+  
 
   const handleDelete = (item) => {
     const deletedItemId = item.id;
@@ -128,7 +131,7 @@ const Home = () => {
       add = doneTemp[source.index];
       doneTemp.splice(source.index, 1);
     }
-    handleUpdateStatus(destination.droppableId, add.id, 1);
+    handleUpdateStatus(destination.droppableId, add.id, add.version);
   };
 
   const handleState = (status, item) => {
