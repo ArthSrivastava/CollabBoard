@@ -6,36 +6,35 @@ import {
   DialogBody,
   DialogFooter,
 } from "@material-tailwind/react";
-import { updateDescription } from "../services/ItemService";
+import { createItem, updateDescription } from "../services/ItemService";
 import { toast } from "react-toastify";
 
-export const UpdateNote = ({ item, open, setOpen, setItems }) => {
-  const [note, setNote] = useState(item.description);
-
+export const CreateNote = ({ open, setOpen, setItems }) => {
+  const [note, setNote] = useState("");
   const handleNoteChange = (event) => {
     setNote(event.target.value);
   };
 
-  const handleUpdateDescription = () => {
-    const body = {
-      description: note
-    }
-    updateDescription(body, item.id, item.version).subscribe({
+  const handleCreateNote = () => {
+    const item = {
+      description: note,
+    };
+    const subscription = createItem(item).subscribe({
       next: (v) => {
-        toast.success("Note updated successfully!")
-        setItems((prevItems) => prevItems.map((it) => it.id === item.id ? v.response : it))
+        toast.success("Note created successfully!");
+        setItems((prevItems) => [...prevItems, v.response]);
       },
-      error: (e) => toast.error("Note updation failed"),
+      error: (e) => toast.error("Note creation failed"),
       complete: () => console.info("complete update"),
-    })
-
+    });
     setOpen(false);
-  }
+    return () => subscription.unsubscribe();
+  };
 
   return (
     <>
       <Dialog open={open} handler={setOpen}>
-        <DialogHeader>Update your note</DialogHeader>
+        <DialogHeader>Create note</DialogHeader>
         <DialogBody divider className="h-[20rem] ">
           <textarea
             className="h-72 w-full px-3 py-2 text-md border border-2 rounded-lg focus:outline-none focus:border-teal-500 resize-none overflow-y-auto"
@@ -47,8 +46,8 @@ export const UpdateNote = ({ item, open, setOpen, setItems }) => {
           <Button variant="outlined" color="red" onClick={() => setOpen(false)}>
             Close
           </Button>
-          <Button variant="gradient" color="green" onClick={handleUpdateDescription}>
-            Save changes
+          <Button variant="gradient" color="green" onClick={handleCreateNote}>
+            Create
           </Button>
         </DialogFooter>
       </Dialog>

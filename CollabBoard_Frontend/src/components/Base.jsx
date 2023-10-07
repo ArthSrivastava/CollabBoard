@@ -1,12 +1,12 @@
 import React from "react";
 import { CustomNavbar } from "./CustomNavbar";
 
-const Base = ({ children }) => {
+const Base = ({ children, setRefresh }) => {
   return (
-    <>
-      <CustomNavbar />
+    <div>
+      <CustomNavbar setRefresh={setRefresh} />
       {children}
-    </>
+    </div>
   );
 };
 

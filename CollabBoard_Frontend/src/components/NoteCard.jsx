@@ -1,19 +1,15 @@
 import {
   Card,
   CardBody,
-  CardFooter,
   Typography,
   Button,
-  IconButton,
 } from "@material-tailwind/react";
 import { Draggable } from "react-beautiful-dnd";
-import { deleteItem } from "../services/ItemService";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { UpdateNote } from "./UpdateNote";
 import { useState } from "react";
 
-export const NoteCard = ({ item, index, handleDelete }) => {
+export const NoteCard = ({ item, index, handleDelete, setItems }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -23,8 +19,6 @@ export const NoteCard = ({ item, index, handleDelete }) => {
 
   const handleUpdateDescriptionNoteCard = () => {
     setOpen(true);
-    // return (<UpdateNotePage />);
-    // handleUpdateDescription(item);
   }
   return (
     <Draggable draggableId={item.id} index={index}>
@@ -43,17 +37,17 @@ export const NoteCard = ({ item, index, handleDelete }) => {
             >
               <CardBody>
                 <Typography className="note--card" variant="h4">
-                  {item.description}
+                  {item.description.length >= 60 ? item.description.substring(0, 60) + "......." : item.description}
                 </Typography>
-                <div className="flex justify-end justify-between mt-2">
-                  <Button size="sm" onClick={handleUpdateDescriptionNoteCard}>Update</Button>
+                <div className="flex justify-between mt-2">
+                  <Button size="sm" onClick={handleUpdateDescriptionNoteCard}>Read More / Update</Button>
                   <Button size="sm" onClick={handleDeleteNoteCard}>
                     Delete
                   </Button>
                 </div>
               </CardBody>
             </Card>
-            <UpdateNote item={item} open={open} setOpen={setOpen} />
+            <UpdateNote item={item} open={open} setOpen={setOpen} setItems={setItems}/>
           </div>
         );
       }}
