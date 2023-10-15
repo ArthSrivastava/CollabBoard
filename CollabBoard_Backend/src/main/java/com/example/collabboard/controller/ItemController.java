@@ -1,15 +1,15 @@
 package com.example.collabboard.controller;
 
-import com.example.collabboard.dto.ItemPatchResource;
-import com.example.collabboard.dto.ItemResource;
-import com.example.collabboard.dto.ItemUpdateResource;
-import com.example.collabboard.dto.NewItemResource;
+import com.example.collabboard.dto.*;
 import com.example.collabboard.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,6 +18,17 @@ import reactor.core.publisher.Mono;
 public class ItemController {
     private final ItemService itemService;
 
+
+    //Server Sent Events
+   @GetMapping("/events")
+   public Flux<ServerSentEvent<Event>> getEventStream() {
+       return itemService.listenToEvents()
+               .map(event -> ServerSentEvent.<Event>builder()
+                       .retry(Duration.ofSeconds(5))
+                       .event(event.getClass().getSimpleName())
+                       .data(event)
+                       .build());
+   }
 
     @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ItemResource> getAllItems() {

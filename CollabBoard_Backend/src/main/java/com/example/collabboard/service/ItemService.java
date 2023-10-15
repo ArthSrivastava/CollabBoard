@@ -1,15 +1,18 @@
 package com.example.collabboard.service;
 
-import com.example.collabboard.dto.ItemPatchResource;
-import com.example.collabboard.dto.ItemResource;
-import com.example.collabboard.dto.ItemUpdateResource;
-import com.example.collabboard.dto.NewItemResource;
+import com.example.collabboard.dto.*;
 import com.example.collabboard.exception.ItemNotFoundException;
 import com.example.collabboard.exception.UnexpectedItemVersionException;
+import com.example.collabboard.mapper.ItemMapper;
 import com.example.collabboard.model.Item;
 import com.example.collabboard.repository.ItemRepository;
+import com.mongodb.client.model.changestream.OperationType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.mongodb.core.ChangeStreamOptions;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,6 +22,25 @@ import reactor.core.publisher.Mono;
 public class ItemService {
     private final ItemRepository itemRepository;
     private final ModelMapper modelMapper;
+    private final ReactiveMongoTemplate reactiveMongoTemplate;
+   private final ItemMapper itemMapper;
+
+    //Change Stream Events MongoDB
+   public Flux<Event> listenToEvents() {
+       ChangeStreamOptions changeStreamOptions = ChangeStreamOptions.builder()
+               .returnFullDocumentOnUpdate()
+               .filter(Aggregation.newAggregation(
+                       Aggregation.match(Criteria.where("operationType")
+                               .in(OperationType.INSERT.getValue(),
+                                       OperationType.REPLACE.getValue(),
+                                       OperationType.UPDATE.getValue(),
+                                       OperationType.DELETE.getValue())
+
+                       )
+               )).build();
+       return reactiveMongoTemplate.changeStream("item", changeStreamOptions, Item.class)
+               .map(itemMapper::toEvent);
+   }
 
     public Mono<ItemResource> createItemResource(NewItemResource newItemResource) {
         Item item = modelMapper.map(newItemResource, Item.class);
