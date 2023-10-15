@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Base from "../components/Base";
 import { NoteCard } from "../components/NoteCard";
 import { IconButton, Typography } from "@material-tailwind/react";
-import { deleteItem, getItems, updateStatus } from "../services/ItemService";
+import { deleteItem, getItems, updateStatus, listenToEvents } from "../services/ItemService";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { toast } from "react-toastify";
 import { PlusIcon } from "@heroicons/react/24/outline";
@@ -22,6 +22,27 @@ const Home = () => {
       setFlag(!flag);
       return () => subscription.unsubscribe();
     }
+  }, []);
+
+  useEffect(() => {
+    const eventSource = listenToEvents(
+      (savedItem) => {
+        setItems((prevItems) => [...prevItems, savedItem]);
+      },
+      (deletedItem) => {
+        setItems((prevItems) =>
+          prevItems.filter((item) => item.id !== deletedItem.id)
+        );
+      }
+    );
+    // const subscription = getItems().subscribe((item) => {
+    //   setItems((prevItems) => [...prevItems, item]);
+    // });
+  
+    return () => {
+      eventSource.close();
+      // subscription.unsubscribe();
+    };
   }, []);
 
   const handleUpdateStatus = (status, id, version) => {
