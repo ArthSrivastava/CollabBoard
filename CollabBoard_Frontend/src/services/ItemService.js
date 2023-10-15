@@ -60,14 +60,13 @@ export const listenToEvents = (onSaved, onDeleted) => {
 
   // Handle the deletion of items
   eventSource.addEventListener('ItemDeleted', (event) => {
+    console.log("EVENT:", event);
     onDeleted(JSON.parse(event.data));
   });
 
   //Handle errors
   eventSource.onerror = (error) => {
     if (eventSource.readyState === 0) {
-      // The connection has been closed
-      // We should not close the eventSource in order to allow the automatic reconnection
       console.error('Stream closed');
     } else {
       console.error(error);

@@ -25,25 +25,28 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const eventSource = listenToEvents(
+    handleSSE()
+    // return () => {
+    //   eventSource.close();
+    //   // subscription.unsubscribe();
+    // };
+  }, []);
+
+
+  const handleSSE = () => {
+    listenToEvents(
       (savedItem) => {
-        setItems((prevItems) => [...prevItems, savedItem]);
+        console.log("SavedItem:", savedItem);
+
+        setItems((prevItems) => [...prevItems, savedItem.itemResource]);
       },
       (deletedItem) => {
         setItems((prevItems) =>
-          prevItems.filter((item) => item.id !== deletedItem.id)
+          prevItems.filter((item) => item.id !== deletedItem.itemId)
         );
       }
     );
-    // const subscription = getItems().subscribe((item) => {
-    //   setItems((prevItems) => [...prevItems, item]);
-    // });
-  
-    return () => {
-      eventSource.close();
-      // subscription.unsubscribe();
-    };
-  }, []);
+  }
 
   const handleUpdateStatus = (status, id, version) => {
     // Update status in the backend
