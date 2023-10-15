@@ -20,15 +20,15 @@ public class ItemController {
 
 
     //Server Sent Events
-   @GetMapping("/events")
-   public Flux<ServerSentEvent<Event>> getEventStream() {
-       return itemService.listenToEvents()
-               .map(event -> ServerSentEvent.<Event>builder()
-                       .retry(Duration.ofSeconds(5))
-                       .event(event.getClass().getSimpleName())
-                       .data(event)
-                       .build());
-   }
+    @GetMapping("/events")
+    public Flux<ServerSentEvent<Event>> getEventStream() {
+        return itemService.listenToEvents()
+                .map(event -> ServerSentEvent.<Event>builder()
+                        .retry(Duration.ofSeconds(5))
+                        .event(event.getClass().getSimpleName())
+                        .data(event)
+                        .build());
+    }
 
     @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ItemResource> getAllItems() {

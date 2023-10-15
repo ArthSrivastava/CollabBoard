@@ -2,33 +2,21 @@ package com.example.collabboard.mapper;
 
 import com.example.collabboard.dto.*;
 import com.example.collabboard.model.Item;
+import lombok.RequiredArgsConstructor;
 import org.bson.BsonObjectId;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.mongodb.core.ChangeStreamEvent;
+import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
-@Mapper(componentModel = "spring")
-public interface ItemMapper {
+@Component
+@RequiredArgsConstructor
+public class ItemMapper {
 
-   ItemResource toResource(Item item);
+    private final ModelMapper modelMapper;
 
-   @Mapping(target = "id", ignore = true)
-   @Mapping(target = "status", ignore = true)
-   @Mapping(target = "createdDate", ignore = true)
-   @Mapping(target = "lastModifiedDate", ignore = true)
-   @Mapping(target = "version", ignore = true)
-   Item toModel(NewItemResource item);
-
-   @Mapping(target = "id", ignore = true)
-   @Mapping(target = "createdDate", ignore = true)
-   @Mapping(target = "lastModifiedDate", ignore = true)
-   @Mapping(target = "version", ignore = true)
-   void update(ItemUpdateResource updateResource, @MappingTarget Item item);
-
-   default Event toEvent(ChangeStreamEvent<Item> changeStreamEvent) {
+   public Event toEvent(ChangeStreamEvent<Item> changeStreamEvent) {
        Event event = null;
        switch (Objects.requireNonNull(changeStreamEvent.getOperationType())) {
            case DELETE -> {
@@ -38,11 +26,9 @@ public interface ItemMapper {
                                .getDocumentKey()).get("_id")).getValue().toString()));
                event = itemDeleted;
            }
-           case INSERT, UPDATE -> {
-           }
-           case REPLACE -> {
+           case REPLACE, INSERT, UPDATE -> {
                ItemSaved itemSaved = new ItemSaved();
-               itemSaved.setItemResource(toResource(changeStreamEvent.getBody()));
+               itemSaved.setItemResource(modelMapper.map(changeStreamEvent.getBody(), ItemResource.class));
                event = itemSaved;
            }
            default -> throw new UnsupportedOperationException(
