@@ -36,9 +36,16 @@ const Home = () => {
   const handleSSE = () => {
     listenToEvents(
       (savedItem) => {
-        console.log("SavedItem:", savedItem);
+        console.log("SavedItem:", savedItem.itemResource);
 
-        setItems((prevItems) => [...prevItems, savedItem.itemResource]);
+        setItems((prevItems) => {
+          console.log("Prev items", prevItems);
+          // prevItems.forEach((item, index) => {
+          //   return 
+          // })
+          prevItems = prevItems.filter((item) => item.id !== savedItem.itemResource.id);
+          return [...prevItems, savedItem.itemResource];
+        });
       },
       (deletedItem) => {
         setItems((prevItems) =>
