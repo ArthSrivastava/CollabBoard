@@ -1,10 +1,10 @@
 import React from "react";
 import { CustomNavbar } from "./CustomNavbar";
 
-const Base = ({ children, setRefresh }) => {
+const Base = ({ children }) => {
   return (
     <div>
-      <CustomNavbar setRefresh={setRefresh} />
+      <CustomNavbar />
       {children}
     </div>
   );

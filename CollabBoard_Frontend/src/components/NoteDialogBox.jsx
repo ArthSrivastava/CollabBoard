@@ -9,10 +9,26 @@ import {
 import { createItem, updateDescription } from "../services/ItemService";
 import { toast } from "react-toastify";
 
-export const CreateNote = ({ open, setOpen, setItems }) => {
-  const [note, setNote] = useState("");
+export const NoteDialogBox = ({ item, open, setOpen, boxType }) => {
+  const [note, setNote] = useState(item ? item.description : "");
+
   const handleNoteChange = (event) => {
     setNote(event.target.value);
+  };
+
+  const handleUpdateDescription = () => {
+    const body = {
+      description: note,
+    };
+    updateDescription(body, item.id, item.version).subscribe({
+      next: (v) => {
+        toast.success("Note updated successfully!");
+      },
+      error: (e) => toast.error("Note updation failed"),
+      complete: () => console.info("complete update"),
+    });
+
+    setOpen(false);
   };
 
   const handleCreateNote = () => {
@@ -22,10 +38,9 @@ export const CreateNote = ({ open, setOpen, setItems }) => {
     const subscription = createItem(item).subscribe({
       next: (v) => {
         toast.success("Note created successfully!");
-        setItems((prevItems) => [...prevItems, v.response]);
       },
       error: (e) => toast.error("Note creation failed"),
-      complete: () => console.info("complete update"),
+      complete: () => {},
     });
     setOpen(false);
     return () => subscription.unsubscribe();
@@ -34,7 +49,9 @@ export const CreateNote = ({ open, setOpen, setItems }) => {
   return (
     <>
       <Dialog open={open} handler={setOpen}>
-        <DialogHeader>Create note</DialogHeader>
+        <DialogHeader>
+          {boxType === "update-box" ? "Update your note" : "Create Note"}
+        </DialogHeader>
         <DialogBody divider className="h-[20rem] ">
           <textarea
             className="h-72 w-full px-3 py-2 text-md border border-2 rounded-lg focus:outline-none focus:border-teal-500 resize-none overflow-y-auto"
@@ -46,8 +63,16 @@ export const CreateNote = ({ open, setOpen, setItems }) => {
           <Button variant="outlined" color="red" onClick={() => setOpen(false)}>
             Close
           </Button>
-          <Button variant="gradient" color="green" onClick={handleCreateNote}>
-            Create
+          <Button
+            variant="gradient"
+            color="green"
+            onClick={
+              boxType === "update-box"
+                ? handleUpdateDescription
+                : handleCreateNote
+            }
+          >
+            {boxType === "update-box" ? "Save changes" : "Create"}
           </Button>
         </DialogFooter>
       </Dialog>

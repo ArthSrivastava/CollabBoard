@@ -6,10 +6,10 @@ import {
 } from "@material-tailwind/react";
 import { Draggable } from "react-beautiful-dnd";
 import { useNavigate } from "react-router-dom";
-import { UpdateNote } from "./UpdateNote";
 import { useState } from "react";
+import { NoteDialogBox } from "./NoteDialogBox";
 
-export const NoteCard = ({ item, index, handleDelete, setItems }) => {
+export const NoteCard = ({ item, index, handleDelete }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -47,7 +47,7 @@ export const NoteCard = ({ item, index, handleDelete, setItems }) => {
                 </div>
               </CardBody>
             </Card>
-            <UpdateNote item={item} open={open} setOpen={setOpen} setItems={setItems}/>
+            <NoteDialogBox item={item} open={open} setOpen={setOpen} boxType="update-box"/>
           </div>
         );
       }}

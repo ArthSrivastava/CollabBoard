@@ -7,9 +7,7 @@ export const getItems = () => {
   return new Observable((subscriber) => {
     const source = new EventSource(BASE_URL + "/items");
     source.onmessage = (event) => {
-      // console.log("Event:", event);
       const item = JSON.parse(event.data);
-      // console.log("data:", item);
       subscriber.next(item);
     };
 
@@ -60,7 +58,6 @@ export const listenToEvents = (onSaved, onDeleted) => {
 
   // Handle the deletion of items
   eventSource.addEventListener('ItemDeleted', (event) => {
-    console.log("EVENT:", event);
     onDeleted(JSON.parse(event.data));
   });
 

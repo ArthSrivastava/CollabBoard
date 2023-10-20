@@ -2,17 +2,21 @@ import React, { useEffect, useState } from "react";
 import Base from "../components/Base";
 import { NoteCard } from "../components/NoteCard";
 import { IconButton, Typography } from "@material-tailwind/react";
-import { deleteItem, getItems, updateStatus, listenToEvents } from "../services/ItemService";
+import {
+  deleteItem,
+  getItems,
+  updateStatus,
+  listenToEvents,
+} from "../services/ItemService";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { toast } from "react-toastify";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { CreateNote } from "../components/CreateNote";
+import { NoteDialogBox } from "../components/NoteDialogBox";
 
 const Home = () => {
   const [items, setItems] = useState([]);
   const [flag, setFlag] = useState(false);
   const [open, setOpen] = useState(false);
-  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     if (!flag) {
@@ -26,24 +30,16 @@ const Home = () => {
 
   useEffect(() => {
     handleSSE()
-    // return () => {
-    //   eventSource.close();
-    //   // subscription.unsubscribe();
-    // };
   }, []);
-
 
   const handleSSE = () => {
     listenToEvents(
       (savedItem) => {
-        console.log("SavedItem:", savedItem.itemResource);
-
         setItems((prevItems) => {
-          console.log("Prev items", prevItems);
-          // prevItems.forEach((item, index) => {
-          //   return 
-          // })
-          prevItems = prevItems.filter((item) => item.id !== savedItem.itemResource.id);
+
+          prevItems = prevItems.filter(
+            (item) => item.id !== savedItem.itemResource.id
+          );
           return [...prevItems, savedItem.itemResource];
         });
       },
@@ -53,7 +49,7 @@ const Home = () => {
         );
       }
     );
-  }
+  };
 
   const handleUpdateStatus = (status, id, version) => {
     // Update status in the backend
@@ -66,13 +62,14 @@ const Home = () => {
         setItems((prevItems) =>
           prevItems.map((item) => (item.id === id ? v.response : item))
         );
-        console.log("UPDATE:", v);
       },
       error: (e) => {
-        if(e.response.status === 412) {
-          toast.error("You are trying to modify an outdated version of the resource. Please refresh the data!")
+        if (e.response.status === 412) {
+          toast.error(
+            "You are trying to modify an outdated version of the resource. Please refresh the data!"
+          );
         }
-        console.error(e)
+        console.error(e);
       },
       complete: () => console.info("complete"),
     });
@@ -81,14 +78,22 @@ const Home = () => {
   const handleDelete = (item) => {
     const deletedItemId = item.id;
     deleteItem(item.id, item.version).subscribe({
-      error: (e) => toast.error("Unable to delete the item!"),
+      next: (v) => {
+        //update state
+        setItems((prevItems) =>
+          prevItems.filter((item) => item.id != deletedItemId)
+        );
+      },
+      error: (e) => {
+        if (e.response.status === 412) {
+          toast.error(
+            "You are trying to modify an outdated version of the resource. Please refresh the data!"
+          );
+        } else 
+            toast.error("Unable to delete the item!");
+      },
       complete: () => toast.success("Item deleted successfully!"),
     });
-
-    //update state
-    setItems((prevItems) =>
-      prevItems.filter((item) => item.id != deletedItemId)
-    );
   };
 
   // In your render method
@@ -123,10 +128,10 @@ const Home = () => {
 
   const openCreateForm = () => {
     setOpen(true);
-  }
+  };
 
   return (
-    <Base setRefresh={setRefresh}>
+    <Base>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="grid grid-cols-3 gap-4 mt-7 text-white h-[600px] home">
           {[todoItems, doingItems, doneItems].map((items, i) => (
@@ -151,7 +156,6 @@ const Home = () => {
                       key={item.id}
                       index={index}
                       handleDelete={handleDelete}
-                      setItems={setItems}
                     />
                   ))}
                   {provided.placeholder}
@@ -162,11 +166,16 @@ const Home = () => {
         </div>
       </DragDropContext>
       <div className="flex justify-center mt-1 z-3 fixed inset-x-0 bottom-0 z-10">
-        <IconButton size="lg" color="teal" className="rounded-full" onClick={openCreateForm}>
+        <IconButton
+          size="lg"
+          color="teal"
+          className="rounded-full"
+          onClick={openCreateForm}
+        >
           <PlusIcon className="h-7 w-7 transition-transform group-hover:rotate-45" />
         </IconButton>
       </div>
-      <CreateNote open={open} setOpen={setOpen} setItems={setItems}/>
+      <NoteDialogBox open={open} setOpen={setOpen} boxType="create-box"/>
     </Base>
   );
 };
