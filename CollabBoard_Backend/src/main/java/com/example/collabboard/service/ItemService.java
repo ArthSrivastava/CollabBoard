@@ -1,6 +1,7 @@
 package com.example.collabboard.service;
 
 import com.example.collabboard.dto.*;
+import com.example.collabboard.dto.event.Event;
 import com.example.collabboard.exception.ItemNotFoundException;
 import com.example.collabboard.exception.UnexpectedItemVersionException;
 import com.example.collabboard.mapper.ItemMapper;

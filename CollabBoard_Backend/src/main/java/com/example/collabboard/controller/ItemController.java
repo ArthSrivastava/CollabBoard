@@ -1,6 +1,9 @@
 package com.example.collabboard.controller;
 
+import com.example.collabboard.config.SSEConfig;
 import com.example.collabboard.dto.*;
+import com.example.collabboard.dto.event.Event;
+import com.example.collabboard.dto.event.HeartBeat;
 import com.example.collabboard.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -22,9 +25,17 @@ public class ItemController {
     //Server Sent Events
     @GetMapping("/events")
     public Flux<ServerSentEvent<Event>> getEventStream() {
-        return itemService.listenToEvents()
+        Flux<Event> eventFlux = itemService.listenToEvents();
+
+        if(SSEConfig.HEART_BEAT_DELAY_MS > 0) {
+            //Sending a heart beat signal every 25 seconds to keep the connection alive
+            Flux<HeartBeat> heartBeatFlux = Flux.interval(Duration.ofMillis(SSEConfig.HEART_BEAT_DELAY_MS))
+                    .map(sequence -> new HeartBeat());
+            eventFlux = Flux.merge(heartBeatFlux, eventFlux);
+        }
+        return eventFlux
                 .map(event -> ServerSentEvent.<Event>builder()
-                        .retry(Duration.ofSeconds(5))
+                        .retry(Duration.ofMillis(SSEConfig.RECONNECTION_DELAY_MS))
                         .event(event.getClass().getSimpleName())
                         .data(event)
                         .build());

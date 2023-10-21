@@ -1,6 +1,9 @@
 package com.example.collabboard.mapper;
 
 import com.example.collabboard.dto.*;
+import com.example.collabboard.dto.event.Event;
+import com.example.collabboard.dto.event.ItemDeleted;
+import com.example.collabboard.dto.event.ItemSaved;
 import com.example.collabboard.model.Item;
 import lombok.RequiredArgsConstructor;
 import org.bson.BsonObjectId;

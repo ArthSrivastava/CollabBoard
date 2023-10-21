@@ -1,4 +1,4 @@
-package com.example.collabboard.dto;
+package com.example.collabboard.dto.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
