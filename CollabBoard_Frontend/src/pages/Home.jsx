@@ -69,9 +69,7 @@ const Home = () => {
             "You are trying to modify an outdated version of the resource. Please refresh the data!"
           );
         }
-        console.error(e);
-      },
-      complete: () => console.info("complete"),
+      }
     });
   };
 

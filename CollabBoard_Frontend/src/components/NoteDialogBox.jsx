@@ -24,8 +24,7 @@ export const NoteDialogBox = ({ item, open, setOpen, boxType }) => {
       next: (v) => {
         toast.success("Note updated successfully!");
       },
-      error: (e) => toast.error("Note updation failed"),
-      complete: () => console.info("complete update"),
+      error: (e) => toast.error("Note updation failed")
     });
 
     setOpen(false);
@@ -39,8 +38,7 @@ export const NoteDialogBox = ({ item, open, setOpen, boxType }) => {
       next: (v) => {
         toast.success("Note created successfully!");
       },
-      error: (e) => toast.error("Note creation failed"),
-      complete: () => {},
+      error: (e) => toast.error("Note creation failed")
     });
     setOpen(false);
     return () => subscription.unsubscribe();
