@@ -43,8 +43,10 @@ public class ItemService {
                .map(itemMapper::toEvent);
    }
 
-    public Mono<ItemResource> createItemResource(NewItemResource newItemResource) {
+    public Mono<ItemResource> createItemResource(String userId, String boardId, NewItemResource newItemResource) {
         Item item = modelMapper.map(newItemResource, Item.class);
+        item.setUserId(userId);
+        item.setBoardId(boardId);
         return itemRepository.save(item).flatMap(
                 savedItem -> {
                     ItemResource itemResource = modelMapper.map(savedItem, ItemResource.class);
@@ -53,8 +55,8 @@ public class ItemService {
         );
     }
 
-    public Flux<ItemResource> getAllItems() {
-        return itemRepository.findAll()
+    public Flux<ItemResource> getAllItems(String boardId) {
+        return itemRepository.findAllByBoardId(boardId)
                 .flatMap(item -> Flux.just(modelMapper.map(item, ItemResource.class)));
     }
 

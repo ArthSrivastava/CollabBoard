@@ -11,6 +11,8 @@ public class ItemResource {
     private Long version;
     private String description;
     private ItemStatus status;
+    private String userId;
+    private String boardId;
     private Instant createdDate;
     private Instant lastModifiedDate;
 }

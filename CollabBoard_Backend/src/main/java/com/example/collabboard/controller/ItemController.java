@@ -16,14 +16,14 @@ import java.time.Duration;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/items")
+@RequestMapping("/api/v1")
 @CrossOrigin(origins = "http://localhost:5173")
 public class ItemController {
     private final ItemService itemService;
 
 
     //Server Sent Events
-    @GetMapping("/events")
+    @GetMapping("/items/events")
     public Flux<ServerSentEvent<Event>> getEventStream() {
         Flux<Event> eventFlux = itemService.listenToEvents();
 
@@ -41,24 +41,26 @@ public class ItemController {
                         .build());
     }
 
-    @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ItemResource> getAllItems() {
-        return itemService.getAllItems();
+    @GetMapping(value = "/boards/{boardId}/items", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ItemResource> getAllItems(@PathVariable String boardId) {
+        return itemService.getAllItems(boardId);
     }
 
-    @PostMapping
-    public Mono<ItemResource> create(@RequestBody NewItemResource itemResource) {
-        return itemService.createItemResource(itemResource);
+    @PostMapping("/users/{userId}/boards/{boardId}/items")
+    public Mono<ItemResource> create(@PathVariable String userId,
+                                     @PathVariable String boardId,
+                                     @RequestBody NewItemResource itemResource) {
+        return itemService.createItemResource(userId, boardId, itemResource);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/items/{id}")
     public Mono<ItemResource> update(@PathVariable String id,
                                      @RequestHeader(name = "if-match", required = false) Long version,
                                      @RequestBody ItemUpdateResource itemUpdateResource) {
         return itemService.updateItem(id, version, itemUpdateResource);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/items/{id}")
     public Mono<ItemResource> update(@PathVariable String id,
                                      @RequestHeader(name = "if-match", required = false) Long version,
                                      @RequestBody ItemPatchResource itemPatchResource) {
@@ -66,7 +68,7 @@ public class ItemController {
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/items/{id}")
     public Mono<Void> delete(@PathVariable String id,
                              @RequestHeader(name = "if-match", required = false) Long version) {
         return itemService.deleteById(id, version);
