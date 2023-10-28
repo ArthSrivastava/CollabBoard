@@ -32,7 +32,7 @@ public class BoardController {
                 .getBoardByLink(uniqueLink);
     }
 
-    @PostMapping("/users/{userId}/boards")
+    @PostMapping("/users/{userId}/boards/join")
     public Mono<Boolean> joinBoard(@PathVariable String userId, @RequestParam String uniqueLink) {
         return boardService
                 .joinBoard(uniqueLink, userId);
