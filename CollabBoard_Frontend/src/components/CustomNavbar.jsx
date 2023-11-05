@@ -188,43 +188,43 @@ function NavListMenu() {
 }
  
 // nav list component
-const navListItems = [
-  {
-    label: "Account",
-    icon: UserCircleIcon,
-  },
-  {
-    label: "Blocks",
-    icon: CubeTransparentIcon,
-  },
-  {
-    label: "Docs",
-    icon: CodeBracketSquareIcon,
-  },
-];
+// const navListItems = [
+//   {
+//     label: "Account",
+//     icon: UserCircleIcon,
+//   },
+//   {
+//     label: "Blocks",
+//     icon: CubeTransparentIcon,
+//   },
+//   {
+//     label: "Docs",
+//     icon: CodeBracketSquareIcon,
+//   },
+// ];
  
-function NavList() {
-  return (
-    <ul className="mb-4 mt-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
-      <NavListMenu />
-      {navListItems.map(({ label, icon }, key) => (
-        <Typography
-          key={label}
-          as="a"
-          href="#"
-          variant="small"
-          color="blue-gray"
-          className="font-normal"
-        >
-          <MenuItem className="flex items-center gap-2 lg:rounded-full">
-            {React.createElement(icon, { className: "h-[18px] w-[18px]" })}{" "}
-            {label}
-          </MenuItem>
-        </Typography>
-      ))}
-    </ul>
-  );
-}
+// function NavList() {
+//   return (
+//     <ul className="mb-4 mt-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
+//       <NavListMenu />
+//       {navListItems.map(({ label, icon }, key) => (
+//         <Typography
+//           key={label}
+//           as="a"
+//           href="#"
+//           variant="small"
+//           color="blue-gray"
+//           className="font-normal"
+//         >
+//           <MenuItem className="flex items-center gap-2 lg:rounded-full">
+//             {React.createElement(icon, { className: "h-[18px] w-[18px]" })}{" "}
+//             {label}
+//           </MenuItem>
+//         </Typography>
+//       ))}
+//     </ul>
+//   );
+// }
  
 export function CustomNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false);
@@ -238,19 +238,19 @@ export function CustomNavbar() {
   }, []);
  
   return (
-    <Navbar className="mx-auto max-w-screen-xl p-2 lg:rounded-full lg:pl-6">
-      <div className="relative mx-auto flex items-center text-blue-gray-900">
+    <Navbar className="mx-auto max-w-full h-max p-2 rounded-none lg:p-1 bg-transparent border-0" >
+      <div className="relative mx-auto flex items-center text-white">
         <Typography
           as="a"
           href="#"
-          variant="h4"
+          variant="h3"
           className="mr-4 ml-2 cursor-pointer py-1.5 font-medium"
         >
           CollabBoard
         </Typography>
-        <div className="absolute top-2/4 left-2/4 hidden -translate-x-2/4 -translate-y-2/4 lg:block">
+        {/* <div className="absolute top-2/4 left-2/4 hidden -translate-x-2/4 -translate-y-2/4 lg:block">
           <NavList />
-        </div>
+        </div> */}
         <IconButton
           size="sm"
           color="blue-gray"
@@ -262,9 +262,9 @@ export function CustomNavbar() {
         </IconButton>
         <ProfileMenu />
       </div>
-      <Collapse open={isNavOpen} className="overflow-scroll">
-        <NavList />
-      </Collapse>
+      {/* <Collapse open={isNavOpen} className="overflow-scroll"> */}
+        {/* <NavList /> */}
+      {/* </Collapse> */}
     </Navbar>
   );
 }

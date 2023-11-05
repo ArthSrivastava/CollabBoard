@@ -9,7 +9,7 @@ import {
 import { createItem, updateDescription } from "../services/ItemService";
 import { toast } from "react-toastify";
 
-export const NoteDialogBox = ({ item, open, setOpen, boxType }) => {
+export const NoteDialogBox = ({ item, open, setOpen, boxType, boardId, user }) => {
   const [note, setNote] = useState(item ? item.description : "");
 
   const handleNoteChange = (event) => {
@@ -34,7 +34,8 @@ export const NoteDialogBox = ({ item, open, setOpen, boxType }) => {
     const item = {
       description: note,
     };
-    const subscription = createItem(item).subscribe({
+    console.log("USER ID:", user);
+    const subscription = createItem(item, user.id, boardId).subscribe({
       next: (v) => {
         toast.success("Note created successfully!");
       },

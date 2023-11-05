@@ -12,15 +12,24 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { toast } from "react-toastify";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { NoteDialogBox } from "../components/NoteDialogBox";
+import { getUserById } from "../services/UserService";
+import { useLocation, useParams } from "react-router-dom";
+import { getCurrentUserData } from "../services/AuthService";
 
 const Home = () => {
   const [items, setItems] = useState([]);
   const [flag, setFlag] = useState(false);
   const [open, setOpen] = useState(false);
+  const { boardId } = useParams();
+  const [user, setUser] = useState({});
 
+  useState(() => {
+    setUser(getCurrentUserData());
+  }, []);
   useEffect(() => {
     if (!flag) {
-      const subscription = getItems().subscribe((item) => {
+      console.log("BOARDID:", boardId);
+      const subscription = getItems(boardId).subscribe((item) => {
         setItems((prevItems) => [...prevItems, item]);
       });
       setFlag(!flag);
@@ -29,14 +38,20 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    handleSSE()
+    handleSSE();
   }, []);
+
+  // useEffect(() => {
+  //   getUserById("653d5f19a6756a1c5518c244")
+  //   .subscribe((user) => {
+  //     console.log("USer from id:", user);
+  //   });
+  // })
 
   const handleSSE = () => {
     listenToEvents(
       (savedItem) => {
         setItems((prevItems) => {
-
           prevItems = prevItems.filter(
             (item) => item.id !== savedItem.itemResource.id
           );
@@ -69,7 +84,7 @@ const Home = () => {
             "You are trying to modify an outdated version of the resource. Please refresh the data!"
           );
         }
-      }
+      },
     });
   };
 
@@ -87,8 +102,7 @@ const Home = () => {
           toast.error(
             "You are trying to modify an outdated version of the resource. Please refresh the data!"
           );
-        } else 
-            toast.error("Unable to delete the item!");
+        } else toast.error("Unable to delete the item!");
       },
       complete: () => toast.success("Item deleted successfully!"),
     });
@@ -173,7 +187,13 @@ const Home = () => {
           <PlusIcon className="h-7 w-7 transition-transform group-hover:rotate-45" />
         </IconButton>
       </div>
-      <NoteDialogBox open={open} setOpen={setOpen} boxType="create-box"/>
+      <NoteDialogBox
+        open={open}
+        setOpen={setOpen}
+        boardId={boardId}
+        user={user}
+        boxType="create-box"
+      />
     </Base>
   );
 };

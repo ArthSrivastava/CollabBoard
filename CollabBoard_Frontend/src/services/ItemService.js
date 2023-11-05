@@ -3,9 +3,9 @@ import { Observable, fromEvent, map, subscribeOn } from "rxjs";
 import { ajax } from "rxjs/ajax";
 import { BASE_URL } from "../utils/AppConstants";
 
-export const getItems = () => {
+export const getItems = (boardId) => {
   return new Observable((subscriber) => {
-    const source = new EventSource(BASE_URL + "/items");
+    const source = new EventSource(BASE_URL + `/items/boards/${boardId}`);
     source.onmessage = (event) => {
       const item = JSON.parse(event.data);
       subscriber.next(item);
@@ -26,9 +26,10 @@ export const getItems = () => {
   });
 };
 
-export const createItem = (item) => {
-  return ajax.post(BASE_URL + "/items", item, {
-    'Content-Type': 'application/json'
+export const createItem = (item, userId, boardId) => {
+  return ajax.post(BASE_URL + `/users/${userId}/boards/${boardId}/items`, item, {
+    'Content-Type': 'application/json',
+    withCredentials: true
   });
 }
 
@@ -37,19 +38,21 @@ export const getItemById = (id) => {
 }
 
 export const deleteItem = (id, version) => {
-  return ajax.delete(`${BASE_URL}/items/${id}`, {'if-match': version});
+  return ajax.delete(`${BASE_URL}/items/${id}`, {'if-match': version, withCredentials: true});
 }
 
 export const updateDescription = (body, id, version) => {
-  return ajax.patch(`${BASE_URL}/items/${id}`, body, {'if-match': version})
+  return ajax.patch(`${BASE_URL}/items/${id}`, body, {'if-match': version, withCredentials: true})
 }
 
 export const updateStatus = (body, id, version) => {
-  return ajax.patch(`${BASE_URL}/items/${id}`, body, {'if-match': version})
+  return ajax.patch(`${BASE_URL}/items/${id}`, body, {'if-match': version, withCredentials: true})
 }
 
 export const listenToEvents = (onSaved, onDeleted) => {
-  const eventSource = new EventSource(`${BASE_URL}/items/events`);
+  const eventSource = new EventSource(`${BASE_URL}/items/events`, {
+    withCredentials: true
+  });
   
   //Handle the create and update of items
   eventSource.addEventListener('ItemSaved', (event) => {
