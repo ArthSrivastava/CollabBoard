@@ -33,8 +33,11 @@ public class AuthController {
             log.info("Authentication: {}", authentication);
             return userService.getUserByEmail(loginRequest.getEmail())
                     .doOnNext(userDto -> {
+                        System.out.println("+++Session:" + session.getId());
                         session.getAttributes().putIfAbsent("user", userDto.getEmail());
+                        System.out.println("+++Session user attr:" + session.getAttribute("user"));
                     });
         }).onErrorResume(e -> Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid Credentials!")));
+
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -34,12 +35,15 @@ public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http,
-                                                         ReactiveAuthenticationManager authenticationManager) {
+                                                         ReactiveAuthenticationManager authenticationManager,
+                                                         CorsConfigurationSource corsConfigurationSource) {
         http
+                .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+                        .pathMatchers("/api/v1/users/**").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/v1/items/**").permitAll()
                         .anyExchange().authenticated())
                 .authenticationManager(authenticationManager);
         return http.build();

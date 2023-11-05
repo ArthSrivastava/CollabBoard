@@ -17,7 +17,6 @@ import java.time.Duration;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
-@CrossOrigin(origins = "http://localhost:5173")
 public class ItemController {
     private final ItemService itemService;
 
@@ -41,7 +40,7 @@ public class ItemController {
                         .build());
     }
 
-    @GetMapping(value = "/boards/{boardId}/items", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/items/boards/{boardId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ItemResource> getAllItems(@PathVariable String boardId) {
         return itemService.getAllItems(boardId);
     }

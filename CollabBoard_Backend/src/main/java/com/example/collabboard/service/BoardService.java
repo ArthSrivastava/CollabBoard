@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BoardService {
 
-    @Value("${frontend.board.url}")
+    @Value("${frontend.board.path}")
     private String baseUrl;
     private final BoardRepository boardRepository;
     private final BoardMapper boardMapper;
