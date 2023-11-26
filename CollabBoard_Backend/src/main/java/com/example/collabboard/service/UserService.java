@@ -5,7 +5,7 @@ import com.example.collabboard.mapper.UserMapper;
 import com.example.collabboard.model.User;
 import com.example.collabboard.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -14,13 +14,11 @@ import reactor.core.publisher.Mono;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
 
-    public Mono<UserDto> createUser(UserDto userDto) {
-        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        return userRepository
-                .save(userMapper.toUser(userDto))
-                .map(userMapper::toUserDto);
+    public Mono<UserDto> createUser(Jwt jwt) {
+        User user = userMapper.fromJwtClaims(jwt.getClaims());
+        return userRepository.findByEmail(user.getEmail())
+                .switchIfEmpty(userRepository.save(user)).map(userMapper::toUserDto);
     }
 
     public Mono<UserDto> getUserById(String userId) {

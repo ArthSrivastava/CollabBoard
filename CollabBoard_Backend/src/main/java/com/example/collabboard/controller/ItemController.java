@@ -22,9 +22,9 @@ public class ItemController {
 
 
     //Server Sent Events
-    @GetMapping("/items/events")
-    public Flux<ServerSentEvent<Event>> getEventStream() {
-        Flux<Event> eventFlux = itemService.listenToEvents();
+    @GetMapping("/items/events/{boardId}")
+    public Flux<ServerSentEvent<Event>> getEventStream(@PathVariable String boardId) {
+        Flux<Event> eventFlux = itemService.listenToEvents(boardId);
 
         if(SSEConfig.HEART_BEAT_DELAY_MS > 0) {
             //Sending a heart beat signal every 25 seconds to keep the connection alive

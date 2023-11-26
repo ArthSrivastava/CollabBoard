@@ -27,7 +27,8 @@ public class ItemService {
    private final ItemMapper itemMapper;
 
     //Change Stream Events MongoDB
-   public Flux<Event> listenToEvents() {
+   public Flux<Event> listenToEvents(String boardId) {
+       Criteria boardIdCriteria = Criteria.where("boardId").is(boardId);
        ChangeStreamOptions changeStreamOptions = ChangeStreamOptions.builder()
                .returnFullDocumentOnUpdate()
                .filter(Aggregation.newAggregation(
@@ -37,7 +38,8 @@ public class ItemService {
                                        OperationType.UPDATE.getValue(),
                                        OperationType.DELETE.getValue())
 
-                       )
+                       ),
+                       Aggregation.match(boardIdCriteria)
                )).build();
        return reactiveMongoTemplate.changeStream("item", changeStreamOptions, Item.class)
                .map(itemMapper::toEvent);

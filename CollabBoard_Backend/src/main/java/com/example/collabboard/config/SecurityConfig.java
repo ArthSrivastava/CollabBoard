@@ -1,6 +1,7 @@
 package com.example.collabboard.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,33 +20,25 @@ import org.springframework.web.cors.reactive.CorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Bean
-    public BCryptPasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public ReactiveAuthenticationManager reactiveAuthenticationManager(ReactiveUserDetailsService reactiveUserDetailsService,
-                                                                       PasswordEncoder passwordEncoder) {
-        UserDetailsRepositoryReactiveAuthenticationManager authenticationManager =
-                new UserDetailsRepositoryReactiveAuthenticationManager(reactiveUserDetailsService);
-        authenticationManager.setPasswordEncoder(passwordEncoder);
-        return authenticationManager;
-    }
-
+    @Value("${google.jwk.uri}")
+    private String jwkUri;
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http,
-                                                         ReactiveAuthenticationManager authenticationManager,
                                                          CorsConfigurationSource corsConfigurationSource) {
         http
                 .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+                .oauth2ResourceServer(
+                        o -> o.jwt(jwtSpec -> jwtSpec.jwkSetUri(jwkUri))
+                )
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/api/v1/users/**").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/v1/users/{userId}/boards/{boardId}/items").authenticated()
+//                        .pathMatchers("/api/v1/users/**").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/v1/items/**").permitAll()
-                        .anyExchange().authenticated())
-                .authenticationManager(authenticationManager);
+                        .anyExchange().authenticated());
         return http.build();
     }
 }

@@ -15,8 +15,6 @@ public class UserDto {
     private String id;
     private String name;
     private String email;
-
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
+    private String picture;
     private List<String> boardIds;
 }

@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 @RequiredArgsConstructor
 public class UserMapper {
@@ -18,4 +20,6 @@ public class UserMapper {
     public UserDto toUserDto(User user) {
         return modelMapper.map(user, UserDto.class);
     }
+
+    public User fromJwtClaims(Map<String, Object> claims) { return modelMapper.map(claims, User.class); }
 }
