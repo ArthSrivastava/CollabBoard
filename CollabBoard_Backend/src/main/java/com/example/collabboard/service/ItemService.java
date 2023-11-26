@@ -27,7 +27,8 @@ public class ItemService {
    private final ItemMapper itemMapper;
 
     //Change Stream Events MongoDB
-   public Flux<Event> listenToEvents() {
+   public Flux<Event> listenToEvents(String boardId) {
+       Criteria boardIdCriteria = Criteria.where("boardId").is(boardId);
        ChangeStreamOptions changeStreamOptions = ChangeStreamOptions.builder()
                .returnFullDocumentOnUpdate()
                .filter(Aggregation.newAggregation(
@@ -37,14 +38,17 @@ public class ItemService {
                                        OperationType.UPDATE.getValue(),
                                        OperationType.DELETE.getValue())
 
-                       )
+                       ),
+                       Aggregation.match(boardIdCriteria)
                )).build();
        return reactiveMongoTemplate.changeStream("item", changeStreamOptions, Item.class)
                .map(itemMapper::toEvent);
    }
 
-    public Mono<ItemResource> createItemResource(NewItemResource newItemResource) {
+    public Mono<ItemResource> createItemResource(String userId, String boardId, NewItemResource newItemResource) {
         Item item = modelMapper.map(newItemResource, Item.class);
+        item.setUserId(userId);
+        item.setBoardId(boardId);
         return itemRepository.save(item).flatMap(
                 savedItem -> {
                     ItemResource itemResource = modelMapper.map(savedItem, ItemResource.class);
@@ -53,8 +57,8 @@ public class ItemService {
         );
     }
 
-    public Flux<ItemResource> getAllItems() {
-        return itemRepository.findAll()
+    public Flux<ItemResource> getAllItems(String boardId) {
+        return itemRepository.findAllByBoardId(boardId)
                 .flatMap(item -> Flux.just(modelMapper.map(item, ItemResource.class)));
     }
 

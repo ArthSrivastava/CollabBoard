@@ -1,11 +1,11 @@
-import { data } from "autoprefixer";
 import { Observable, fromEvent, map, subscribeOn } from "rxjs";
 import { ajax } from "rxjs/ajax";
 import { BASE_URL } from "../utils/AppConstants";
+import { customAjax } from "../utils/UtilFunctions";
 
-export const getItems = () => {
+export const getItems = (boardId) => {
   return new Observable((subscriber) => {
-    const source = new EventSource(BASE_URL + "/items");
+    const source = new EventSource(BASE_URL + `/items/boards/${boardId}`);
     source.onmessage = (event) => {
       const item = JSON.parse(event.data);
       subscriber.next(item);
@@ -26,30 +26,29 @@ export const getItems = () => {
   });
 };
 
-export const createItem = (item) => {
-  return ajax.post(BASE_URL + "/items", item, {
-    'Content-Type': 'application/json'
-  });
+export const createItem = (item, userId, boardId) => {
+  return customAjax(`${BASE_URL}/users/${userId}/boards/${boardId}/items`, 'POST', item, true, {});
 }
 
 export const getItemById = (id) => {
-  return ajax.get(`${BASE_URL}/item/${id}`);
+  return customAjax(`${BASE_URL}/item/${id}`, 'GET', null, false, {});
 }
 
 export const deleteItem = (id, version) => {
-  return ajax.delete(`${BASE_URL}/items/${id}`, {'if-match': version});
+  return customAjax(`${BASE_URL}/items/${id}`, 'DELETE', null, true, {'if-match': version})
 }
 
 export const updateDescription = (body, id, version) => {
-  return ajax.patch(`${BASE_URL}/items/${id}`, body, {'if-match': version})
+  return customAjax(`${BASE_URL}/items/${id}`, 'PATCH', body, true, {'if-match': version})
 }
 
+//fix: same method
 export const updateStatus = (body, id, version) => {
-  return ajax.patch(`${BASE_URL}/items/${id}`, body, {'if-match': version})
+  return customAjax(`${BASE_URL}/items/${id}`, 'PATCH', body, true, {'if-match': version})
 }
 
-export const listenToEvents = (onSaved, onDeleted) => {
-  const eventSource = new EventSource(`${BASE_URL}/items/events`);
+export const listenToEvents = (onSaved, onDeleted, boardId) => {
+  const eventSource = new EventSource(`${BASE_URL}/items/events/${boardId}`);
   
   //Handle the create and update of items
   eventSource.addEventListener('ItemSaved', (event) => {

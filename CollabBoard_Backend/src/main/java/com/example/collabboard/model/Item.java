@@ -23,7 +23,8 @@ public class Item {
     private String id;
     private String description;
     private ItemStatus status = ItemStatus.TODO;
-
+    private String userId;
+    private String boardId;
     @CreatedDate
     private Instant createdDate;
 
