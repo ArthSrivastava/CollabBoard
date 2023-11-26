@@ -21,11 +21,12 @@ const Home = () => {
   const [flag, setFlag] = useState(false);
   const [open, setOpen] = useState(false);
   const { boardId } = useParams();
-  const [user, setUser] = useState({});
+  // const [user, setUser] = useState({});
 
-  useState(() => {
-    setUser(getCurrentUserData());
-  }, []);
+  // useState(() => {
+  //   console.log("User data->", getCurrentUserData())
+  //   setUser(getCurrentUserData());
+  // }, []);
   useEffect(() => {
     if (!flag) {
       console.log("BOARDID:", boardId);
@@ -41,13 +42,6 @@ const Home = () => {
     handleSSE();
   }, []);
 
-  // useEffect(() => {
-  //   getUserById("653d5f19a6756a1c5518c244")
-  //   .subscribe((user) => {
-  //     console.log("USer from id:", user);
-  //   });
-  // })
-
   const handleSSE = () => {
     listenToEvents(
       (savedItem) => {
@@ -62,7 +56,7 @@ const Home = () => {
         setItems((prevItems) =>
           prevItems.filter((item) => item.id !== deletedItem.itemId)
         );
-      }
+      }, boardId
     );
   };
 
@@ -191,7 +185,6 @@ const Home = () => {
         open={open}
         setOpen={setOpen}
         boardId={boardId}
-        user={user}
         boxType="create-box"
       />
     </Base>

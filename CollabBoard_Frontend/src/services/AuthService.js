@@ -1,20 +1,10 @@
-import { ajax } from "rxjs/ajax";
-import { BASE_URL } from "../utils/AppConstants";
 
 export const loginUser = (data) => {
-  return ajax({
-    url: `${BASE_URL}/auth/login`,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: data,
-    withCredentials: true
-  });
+  localStorage.setItem("data", data);
 };
 
 export const isLoggedIn = () => {
-  return localStorage.getItem('data') !== undefined ? true : false;
+  return localStorage.getItem('data') !== undefined && localStorage.getItem('access_token') !== undefined ? true : false;
 }
 
 //get user data

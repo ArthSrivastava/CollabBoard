@@ -1,11 +1,12 @@
-import { ajax } from "rxjs/ajax"
-import { BASE_URL } from "../utils/AppConstants"
+import { ajax } from "rxjs/ajax";
+import { BASE_URL } from "../utils/AppConstants";
+import { customAjax } from "../utils/UtilFunctions";
 
 export const getUserById = (id) => {
-    return ajax.get(`${BASE_URL}/users/${id}`, {credentials: "include"});
-}
+  return customAjax(`${BASE_URL}/users/${id}`, 'GET', null, true, {});
+};
 
+export const createUser = () => {
+  return customAjax(`${BASE_URL}/users`, 'POST', null, true);
+};
 
-export const registerUser = (data) => {
-    return ajax.post(`${BASE_URL}/users`, data);
-}

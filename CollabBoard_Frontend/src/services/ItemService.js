@@ -1,7 +1,7 @@
-import { data } from "autoprefixer";
 import { Observable, fromEvent, map, subscribeOn } from "rxjs";
 import { ajax } from "rxjs/ajax";
 import { BASE_URL } from "../utils/AppConstants";
+import { customAjax } from "../utils/UtilFunctions";
 
 export const getItems = (boardId) => {
   return new Observable((subscriber) => {
@@ -27,32 +27,28 @@ export const getItems = (boardId) => {
 };
 
 export const createItem = (item, userId, boardId) => {
-  return ajax.post(BASE_URL + `/users/${userId}/boards/${boardId}/items`, item, {
-    'Content-Type': 'application/json',
-    withCredentials: true
-  });
+  return customAjax(`${BASE_URL}/users/${userId}/boards/${boardId}/items`, 'POST', item, true, {});
 }
 
 export const getItemById = (id) => {
-  return ajax.get(`${BASE_URL}/item/${id}`);
+  return customAjax(`${BASE_URL}/item/${id}`, 'GET', null, false, {});
 }
 
 export const deleteItem = (id, version) => {
-  return ajax.delete(`${BASE_URL}/items/${id}`, {'if-match': version, withCredentials: true});
+  return customAjax(`${BASE_URL}/items/${id}`, 'DELETE', null, true, {'if-match': version})
 }
 
 export const updateDescription = (body, id, version) => {
-  return ajax.patch(`${BASE_URL}/items/${id}`, body, {'if-match': version, withCredentials: true})
+  return customAjax(`${BASE_URL}/items/${id}`, 'PATCH', body, true, {'if-match': version})
 }
 
+//fix: same method
 export const updateStatus = (body, id, version) => {
-  return ajax.patch(`${BASE_URL}/items/${id}`, body, {'if-match': version, withCredentials: true})
+  return customAjax(`${BASE_URL}/items/${id}`, 'PATCH', body, true, {'if-match': version})
 }
 
-export const listenToEvents = (onSaved, onDeleted) => {
-  const eventSource = new EventSource(`${BASE_URL}/items/events`, {
-    withCredentials: true
-  });
+export const listenToEvents = (onSaved, onDeleted, boardId) => {
+  const eventSource = new EventSource(`${BASE_URL}/items/events/${boardId}`);
   
   //Handle the create and update of items
   eventSource.addEventListener('ItemSaved', (event) => {

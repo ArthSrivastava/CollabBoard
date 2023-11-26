@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Button,
   Dialog,
@@ -8,10 +8,11 @@ import {
 } from "@material-tailwind/react";
 import { createItem, updateDescription } from "../services/ItemService";
 import { toast } from "react-toastify";
+import { UserContext } from "../context/UserContext";
 
-export const NoteDialogBox = ({ item, open, setOpen, boxType, boardId, user }) => {
+export const NoteDialogBox = ({ item, open, setOpen, boxType, boardId }) => {
   const [note, setNote] = useState(item ? item.description : "");
-
+  const { user } = useContext(UserContext);  
   const handleNoteChange = (event) => {
     setNote(event.target.value);
   };
@@ -39,7 +40,10 @@ export const NoteDialogBox = ({ item, open, setOpen, boxType, boardId, user }) =
       next: (v) => {
         toast.success("Note created successfully!");
       },
-      error: (e) => toast.error("Note creation failed")
+      error: (e) => {
+        console.log("CREATION ERROR: ", e);
+        toast.error("Note creation failed")
+      }
     });
     setOpen(false);
     return () => subscription.unsubscribe();
