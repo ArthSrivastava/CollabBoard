@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
+import java.util.Set;
 
 @Document
 @Data
@@ -18,5 +18,5 @@ public class User {
     private String name;
     private String email;
     private String picture;
-    private List<String> boardIds;
+    private Set<String> boardIds;
 }

@@ -85,6 +85,8 @@ public class ItemService {
     }
 
     public Mono<ItemResource> patch(String id, Long expectedVersion, ItemPatchResource itemPatchResource) {
+
+        System.out.println("expectedVERSION:" + expectedVersion);
         return getItemById(id, expectedVersion)
                 .flatMap(item -> {
                     if (itemPatchResource.getDescription() != null) {
