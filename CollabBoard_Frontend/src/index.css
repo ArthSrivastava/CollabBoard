@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Smooch&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,10 +13,38 @@ body {
   display: none;
 }
 
+.nav {
+  background: transparent;
+}
+
 .heading {
     font-family: 'Pixelify Sans', cursive;
 }
 
+.nav--heading {
+  font-family: 'Smooch', cursive;
+  /* font-family: 'Pixelify Sans', cursive; */
+}
 .note--card {
     font-family: 'Poppins', sans-serif;
 }
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: gold;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+} 

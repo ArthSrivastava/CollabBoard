@@ -10,14 +10,22 @@ import { createItem, updateDescription } from "../services/ItemService";
 import { toast } from "react-toastify";
 import { UserContext } from "../context/UserContext";
 
-export const NoteDialogBox = ({ item, open, setOpen, boxType, boardId }) => {
+export const NoteDialogBox = ({
+  item,
+  open,
+  setOpen,
+  boxType,
+  boardId,
+  setActionInProgress,
+}) => {
   const [note, setNote] = useState(item ? item.description : "");
-  const { user } = useContext(UserContext);  
+  const { user } = useContext(UserContext);
   const handleNoteChange = (event) => {
     setNote(event.target.value);
   };
 
   const handleUpdateDescription = () => {
+    setActionInProgress(true);
     const body = {
       description: note,
     };
@@ -25,7 +33,16 @@ export const NoteDialogBox = ({ item, open, setOpen, boxType, boardId }) => {
       next: (v) => {
         toast.success("Note updated successfully!");
       },
-      error: (e) => toast.error("Note updation failed")
+      error: (e) => {
+        if (e.response.status === 412) {
+          toast.error(
+            "You are trying to modify an outdated version of the resource. Please refresh the data!"
+          );
+        } else {
+          toast.error("Note updation failed");
+        }
+      },
+      complete: () => setActionInProgress(false),
     });
 
     setOpen(false);
@@ -35,15 +52,13 @@ export const NoteDialogBox = ({ item, open, setOpen, boxType, boardId }) => {
     const item = {
       description: note,
     };
-    console.log("USER ID:", user);
     const subscription = createItem(item, user.id, boardId).subscribe({
       next: (v) => {
         toast.success("Note created successfully!");
       },
       error: (e) => {
-        console.log("CREATION ERROR: ", e);
-        toast.error("Note creation failed")
-      }
+        toast.error("Note creation failed");
+      },
     });
     setOpen(false);
     return () => subscription.unsubscribe();

@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { NoteDialogBox } from "./NoteDialogBox";
 
-export const NoteCard = ({ item, index, handleDelete }) => {
+export const NoteCard = ({ item, index, handleDelete, setActionInProgress }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -47,7 +47,7 @@ export const NoteCard = ({ item, index, handleDelete }) => {
                 </div>
               </CardBody>
             </Card>
-            <NoteDialogBox item={item} open={open} setOpen={setOpen} boxType="update-box"/>
+            <NoteDialogBox item={item} open={open} setOpen={setOpen} boxType="update-box" setActionInProgress={setActionInProgress}/>
           </div>
         );
       }}

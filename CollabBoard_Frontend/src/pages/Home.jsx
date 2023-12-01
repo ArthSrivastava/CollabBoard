@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Base from "../components/Base";
 import { NoteCard } from "../components/NoteCard";
 import { IconButton, Typography } from "@material-tailwind/react";
@@ -12,24 +12,24 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { toast } from "react-toastify";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { NoteDialogBox } from "../components/NoteDialogBox";
-import { getUserById } from "../services/UserService";
-import { useLocation, useParams } from "react-router-dom";
-import { getCurrentUserData } from "../services/AuthService";
+import { useNavigate, useParams } from "react-router-dom";
+import { getBoardById, joinBoard } from "../services/BoardService";
+import { UserContext } from "../context/UserContext";
+import { getCurrentUserData, logout } from "../services/AuthService";
+import ClipboardCopy from "../components/ClipboardCopy";
 
 const Home = () => {
   const [items, setItems] = useState([]);
   const [flag, setFlag] = useState(false);
   const [open, setOpen] = useState(false);
   const { boardId } = useParams();
-  // const [user, setUser] = useState({});
+  const [board, setBoard] = useState();
+  const [actionInProgress, setActionInProgress] = useState(false);
+  const navigate = useNavigate();
 
-  // useState(() => {
-  //   console.log("User data->", getCurrentUserData())
-  //   setUser(getCurrentUserData());
-  // }, []);
+  // const { user } = useContext(UserContext);
   useEffect(() => {
     if (!flag) {
-      console.log("BOARDID:", boardId);
       const subscription = getItems(boardId).subscribe((item) => {
         setItems((prevItems) => [...prevItems, item]);
       });
@@ -37,6 +37,19 @@ const Home = () => {
       return () => subscription.unsubscribe();
     }
   }, []);
+
+  useEffect(() => {
+    getBoardById(boardId).subscribe((resp) => {
+      setBoard(resp.response);
+    })
+  }, [])
+
+  useEffect(() => {
+    const user = getCurrentUserData();
+    if(board) 
+      joinBoard(`${board.uniqueLink}`, user.user.id).subscribe((resp) => {
+      });
+  }, [board]);
 
   useEffect(() => {
     handleSSE();
@@ -56,13 +69,15 @@ const Home = () => {
         setItems((prevItems) =>
           prevItems.filter((item) => item.id !== deletedItem.itemId)
         );
-      }, boardId
+      },
+      boardId
     );
   };
 
   const handleUpdateStatus = (status, id, version) => {
     // Update status in the backend
     // ...
+    setActionInProgress(true);
     const body = {
       status: status,
     };
@@ -73,16 +88,20 @@ const Home = () => {
         );
       },
       error: (e) => {
-        if (e.response.status === 412) {
+        if (e.status === 412) {
           toast.error(
             "You are trying to modify an outdated version of the resource. Please refresh the data!"
           );
+        } else if (e.status === 401) {
+          handleUnauthorizedError();
         }
       },
+      complete: () => setActionInProgress(false),
     });
   };
 
   const handleDelete = (item) => {
+    setActionInProgress(true);
     const deletedItemId = item.id;
     deleteItem(item.id, item.version).subscribe({
       next: (v) => {
@@ -92,14 +111,25 @@ const Home = () => {
         );
       },
       error: (e) => {
-        if (e.response.status === 412) {
+        if (e.status === 412) {
           toast.error(
             "You are trying to modify an outdated version of the resource. Please refresh the data!"
           );
+        } else if (e.status === 401) {
+          handleUnauthorizedError();
         } else toast.error("Unable to delete the item!");
       },
-      complete: () => toast.success("Item deleted successfully!"),
+      complete: () => {
+        toast.success("Item deleted successfully!");
+        setActionInProgress(false);
+      },
     });
+  };
+
+  const handleUnauthorizedError = () => {
+    toast.error("Please login again!");
+    logout();
+    navigate("/login");
   };
 
   // In your render method
@@ -138,6 +168,7 @@ const Home = () => {
 
   return (
     <Base>
+      <ClipboardCopy copyText={window.location.href} />
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="grid grid-cols-3 gap-4 mt-7 text-white h-[600px] home">
           {[todoItems, doingItems, doneItems].map((items, i) => (
@@ -152,7 +183,8 @@ const Home = () => {
                 >
                   <Typography
                     variant="h3"
-                    className="text-center heading text-teal-500"
+                    className="text-center heading"
+                    color="amber"
                   >
                     {["Todo", "Doing", "Done"][i]}
                   </Typography>
@@ -162,6 +194,7 @@ const Home = () => {
                       key={item.id}
                       index={index}
                       handleDelete={handleDelete}
+                      setActionInProgress={setActionInProgress}
                     />
                   ))}
                   {provided.placeholder}
@@ -174,7 +207,7 @@ const Home = () => {
       <div className="flex justify-center mt-1 z-3 fixed inset-x-0 bottom-0 z-10">
         <IconButton
           size="lg"
-          color="teal"
+          color="amber"
           className="rounded-full"
           onClick={openCreateForm}
         >
