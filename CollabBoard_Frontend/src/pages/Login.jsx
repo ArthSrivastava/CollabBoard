@@ -7,21 +7,21 @@ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
+
   const responseMessage = (response) => {
     const jwt = response.credential;
-    if(jwt) {
-      console.log("JWT:", jwt)
-      localStorage.setItem('access_token', jwt);
+    if (jwt) {
+      localStorage.setItem("access_token", jwt);
       createUser().subscribe((res) => {
-        console.log("USERINFO:", res.response)
         const data = {
-          user: res.response
-        }
-        loginUser(JSON.stringify(data))
-        navigate(`/board/create/${data.user.id}`)
-      })
+          user: res.response,
+        };
+        loginUser(JSON.stringify(data));
+        navigate(`/dashboard/${data.user.id}`);
+      });
     }
   };
+
   const errorMessage = (error) => {
     console.log(error);
   };
@@ -29,7 +29,17 @@ const Login = () => {
   return (
     <Base>
       <div className="h-[91vh] flex justify-center items-center">
-        <GoogleLogin onSuccess={responseMessage} onError={errorMessage} />
+        <div className="text-center flex flex-col items-center">
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Welcome to Your Collaborative Workspace!
+          </h1>
+          <p className="text-lg text-gray-300 mb-6">
+            Unlock the power of collaboration with our real-time collaborative
+            boards.
+          </p>
+          <GoogleLogin onSuccess={responseMessage} onError={errorMessage} />
+          {/* </GoogleLogin> */}
+        </div>
       </div>
     </Base>
   );

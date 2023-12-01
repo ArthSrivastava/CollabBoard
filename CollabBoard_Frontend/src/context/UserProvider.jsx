@@ -3,13 +3,19 @@ import { getCurrentUserData, isLoggedIn } from "../services/AuthService";
 import { UserContext } from "./UserContext";
 
 const UserProvider = ({children}) => {
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState({
+        id: "",
+        name: "",
+        email: "",
+        picture: "",
+        boardIds: []
+    });
 
     useEffect(() => {
         if(!isLoggedIn()) return;
 
         const data = getCurrentUserData();
-        if(data != undefined)
+        if(data != null)
             setUser(data.user);
     }, [])
 

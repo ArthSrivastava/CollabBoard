@@ -5,7 +5,7 @@ import { ToastContainer } from "react-toastify";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import { PrivateRoutes } from "./components/PrivateRoutes";
-import CreateBoard from "./pages/CreateBoard";
+import CreateBoard from "./pages/Dashboard";
 import UserProvider from "./context/UserProvider";
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
           <Route path="/" element={<Navigate to={"login"} />} />
 
           <Route path="/" element={<PrivateRoutes />}>
-            <Route path="/board/create/:userId" element={<CreateBoard />} />
+            <Route path="/dashboard/:userId" element={<CreateBoard />} />
             <Route path="/board/:boardId" element={<Home />} />
           </Route>
         </Routes>

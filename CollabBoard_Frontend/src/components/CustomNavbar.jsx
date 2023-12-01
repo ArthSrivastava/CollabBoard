@@ -27,38 +27,43 @@ import {
   Bars2Icon,
 } from "@heroicons/react/24/outline";
 import { UserContext } from "../context/UserContext";
- 
-// profile menu component
-const profileMenuItems = [
-  {
-    label: "My Profile",
-    icon: UserCircleIcon,
-  },
-  {
-    label: "Edit Profile",
-    icon: Cog6ToothIcon,
-  },
-  {
-    label: "Inbox",
-    icon: InboxArrowDownIcon,
-  },
-  {
-    label: "Help",
-    icon: LifebuoyIcon,
-  },
-  {
-    label: "Sign Out",
-    icon: PowerIcon,
-  },
-];
- 
+import { useNavigate } from "react-router-dom";
+import { googleLogout } from "@react-oauth/google";
+import { isLoggedIn, logout } from "../services/AuthService";
+
+// const handleClick = (link) => {
+//   navigate(link)
+// }
+
 function ProfileMenu() {
   const { user } = useContext(UserContext);
+  // profile menu component
+  const profileMenuItems = [
+    {
+      label: "My Profile",
+      icon: UserCircleIcon,
+      link: user ? `/dashboard/${user.id}` : ``,
+    },
+    {
+      label: "Dashboard",
+      icon: UserCircleIcon,
+      link: user ? `/dashboard/${user.id}` : ``,
+    },
+    {
+      label: "Sign Out",
+      icon: PowerIcon,
+      link: `/login`,
+    },
+  ];
+
+  // const { user } = useContext(UserContext);
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
- 
+
   const closeMenu = () => setIsMenuOpen(false);
- 
+
   return (
+    
     <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
       <MenuHandler>
         <Button
@@ -71,7 +76,11 @@ function ProfileMenu() {
             size="sm"
             alt="tania andrew"
             className="border border-gray-900 p-0.5"
-            src={user ? user.picture : 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80'}
+            src={
+              user && user.picture !== ''
+                ? user.picture
+                : "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+            }
           />
           <ChevronDownIcon
             strokeWidth={2.5}
@@ -82,12 +91,19 @@ function ProfileMenu() {
         </Button>
       </MenuHandler>
       <MenuList className="p-1">
-        {profileMenuItems.map(({ label, icon }, key) => {
+        {profileMenuItems.map(({ label, icon, link }, key) => {
           const isLastItem = key === profileMenuItems.length - 1;
           return (
             <MenuItem
               key={label}
-              onClick={closeMenu}
+              onClick={() => {
+                setIsMenuOpen(false);
+                if(label === 'Sign Out') {
+                  logout();
+                  googleLogout()
+                }
+                navigate(link);
+              }}
               className={`flex items-center gap-2 rounded ${
                 isLastItem
                   ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
@@ -113,7 +129,7 @@ function ProfileMenu() {
     </Menu>
   );
 }
- 
+
 // nav list menu
 const navListMenuItems = [
   {
@@ -132,10 +148,10 @@ const navListMenuItems = [
       "A complete set of UI Elements for building faster websites in less time.",
   },
 ];
- 
+
 function NavListMenu() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
- 
+
   const renderItems = navListMenuItems.map(({ title, description }) => (
     <a href="#" key={title}>
       <MenuItem>
@@ -148,7 +164,7 @@ function NavListMenu() {
       </MenuItem>
     </a>
   ));
- 
+
   return (
     <React.Fragment>
       <Menu allowHover open={isMenuOpen} handler={setIsMenuOpen}>
@@ -188,7 +204,7 @@ function NavListMenu() {
     </React.Fragment>
   );
 }
- 
+
 // nav list component
 // const navListItems = [
 //   {
@@ -204,7 +220,7 @@ function NavListMenu() {
 //     icon: CodeBracketSquareIcon,
 //   },
 // ];
- 
+
 // function NavList() {
 //   return (
 //     <ul className="mb-4 mt-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
@@ -227,26 +243,26 @@ function NavListMenu() {
 //     </ul>
 //   );
 // }
- 
+
 export function CustomNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false);
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur);
- 
+
   React.useEffect(() => {
     window.addEventListener(
       "resize",
-      () => window.innerWidth >= 960 && setIsNavOpen(false),
+      () => window.innerWidth >= 960 && setIsNavOpen(false)
     );
   }, []);
- 
+
   return (
-    <Navbar className="mx-auto max-w-full h-max p-2 rounded-none lg:p-1 bg-transparent border-0" >
+    <Navbar className="mx-auto max-w-full h-max p-2 rounded-none lg:p-1 border-0 nav">
       <div className="relative mx-auto flex items-center text-white">
         <Typography
           as="a"
-          href="#"
+          onClick={() => navigate("/login")}
           variant="h3"
-          className="mr-4 ml-2 cursor-pointer py-1.5 font-medium"
+          className="mr-4 ml-2 cursor-pointer py-1.5 font-medium nav--heading"
         >
           CollabBoard
         </Typography>
@@ -262,10 +278,10 @@ export function CustomNavbar() {
         >
           <Bars2Icon className="h-6 w-6" />
         </IconButton>
-        <ProfileMenu />
+        {isLoggedIn() && <ProfileMenu />}
       </div>
       {/* <Collapse open={isNavOpen} className="overflow-scroll"> */}
-        {/* <NavList /> */}
+      {/* <NavList /> */}
       {/* </Collapse> */}
     </Navbar>
   );
