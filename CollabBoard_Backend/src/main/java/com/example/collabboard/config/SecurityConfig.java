@@ -5,13 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 
@@ -35,7 +30,7 @@ public class SecurityConfig {
                 )
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.POST, "/api/v1/users/{userId}/boards/{boardId}/items").authenticated()
-//                        .pathMatchers("/api/v1/users/**").permitAll()
+                        .pathMatchers("/api/v1/users/**").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/v1/items/**").permitAll()
                         .anyExchange().authenticated());

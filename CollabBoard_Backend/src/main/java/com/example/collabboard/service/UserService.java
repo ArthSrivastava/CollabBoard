@@ -9,6 +9,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.HashSet;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -17,6 +19,7 @@ public class UserService {
 
     public Mono<UserDto> createUser(Jwt jwt) {
         User user = userMapper.fromJwtClaims(jwt.getClaims());
+        user.setBoardIds(new HashSet<>());
         return userRepository.findByEmail(user.getEmail())
                 .switchIfEmpty(userRepository.save(user)).map(userMapper::toUserDto);
     }

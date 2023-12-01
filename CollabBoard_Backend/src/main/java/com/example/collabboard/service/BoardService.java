@@ -2,6 +2,7 @@ package com.example.collabboard.service;
 
 import com.example.collabboard.dto.BoardDto;
 import com.example.collabboard.mapper.BoardMapper;
+import com.example.collabboard.model.Board;
 import com.example.collabboard.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +43,10 @@ public class BoardService {
         return boardRepository
                 .findByUniqueLink(uniqueLink)
                 .map(boardMapper::toBoardDto);
+    }
+
+    public Mono<BoardDto> getBoardById(String boardId) {
+        return boardRepository.findById(boardId).map(boardMapper::toBoardDto);
     }
 
     public Mono<Boolean> joinBoard(String uniqueLink, String userId) {
